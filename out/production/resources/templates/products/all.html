@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>상품목록</title>
+  <style>
+    * {
+    margin : 0;
+    padding : 0;
+    /*outline : 1px solid red;*/
+    }
+
+    .list {
+    margin: 20px 10px;
+    }
+
+    table, tr, td {
+    border: 0.5px solid black;
+    }
+
+    .row:hover {
+      background-color : yellow;
+    }
+
+    td {
+      text-align : center;
+      padding : 2px;
+    }
+  </style>
+</head>
+<body>
+<div class="list">
+  <h3>상품목록</h3>
+  <form id="frm" action="/products/del" method="POST">
+    <div>
+    <!--  table>thead>tr>td{상품번호}+td{상품명}-->
+      <table>
+    <thead>
+    <tr>
+<!--      <td id="selectAll">선택</td>-->
+      <td>　<input type="checkbox" id="selectAll">　</td>
+      <td>상품번호</td>
+      <td>상품명</td>
+    </tr>
+    </thead>
+<!--    <tbody>-->
+<!--    <tr th:each="product :${list}"> &lt;!&ndash; 반복문 사용 &ndash;&gt;-->
+<!--      <td th:text="${product.productId}"></td>-->
+<!--&lt;!&ndash;      <td th:text="${product.pname}"></td>&ndash;&gt;-->
+<!--&lt;!&ndash;/* <td><a th:href="|/products/${product.productId}/detail|" th:text="${product.pname}"></a></td> */&ndash;&gt;-->
+<!--&lt;!&ndash;/* <td><a th:href="@{/products/{productId}/detail(productId=${product.productId})}" th:text="${product.pname}"></a></td> */&ndash;&gt;-->
+<!--    </tr>-->
+<!--    </tbody>-->
+
+    <tbody id="rows">
+      <tr class="row" th:each="product :${list}" th:data-product-id="${product.productId}"> <!-- 반복문 사용 -->
+        <td class="chk"><input type="checkbox" name="pids" th:value="${product.productId}"></td>
+        <td th:text="${product.productId}"></td>
+        <td th:text="${product.pname}"></td>
+      </tr>
+    </tbody>
+  </table>
+    </div>
+    <div>
+      <button id="delBtn" type="submit">삭제</button>
+      <button id="addBtn" type="button">등록</button>
+    </div>
+  </form>
+  </div>
+
+<script>
+  // 등록 버튼 -----------------------------------------------------------------------
+  const $addBtn = document.getElementById('addBtn');
+  $addBtn.addEventListener('click', evt => {
+    // 목록에서 등록버튼을 누르면 상품 등록화면으로 가게하기
+    location.href = '/products/add';               // GET, http://localhost:9080/products/add
+  });
+
+  // 버튼클릭시 디테일화면 가기-------------------------------------------------------------
+  const $rows = document.getElementById('rows');
+  $rows.addEventListener('click', evt => {
+    // 1) input요소 이면서 checkbox는 제외
+    if(evt.target.tagName === 'INPUT' && evt.target.getAttribute('type') == 'checkbox') { return; }
+    // 2) td요소 중 checkbox있는 td는 제외
+    if(evt.target.tagName == 'TD' && evt.target.classList.contains('chk')) { return; }
+
+    const $row = evt.target.closest('.row');
+    // 사용자 정의 속성을 이용해서 productId를 가져온다
+    const productId = $row.dataset.productId;
+    location.href = `/products/${productId}/detail`;
+  });
+
+  // 여러건 삭제시 묻기-------------------------------------------------
+  const $frm = document.getElementById('frm');
+  $frm.addEventListener('submit', evt => {
+  evt.preventDefault(); // 기본 이벤트 중지 (submit중지)
+  if(!window.confirm('삭제하시겠습니까?')) {
+    return;
+    }
+  evt.target.submit();
+  });
+
+  // 전체선택---------------------------------------------------------
+  // case 2) 일부 체크박스가 체크되어있다면 언체크, 그렇지 않으면 모든 체크박스를 체크
+  const $selectAll = document.getElementById('selectAll');
+  $selectAll.addEventListener('change', evt => {
+    // Array.from를 이용하여 nodelist를 배열로 변경
+    const $arr = Array.from(document.querySelectorAll('#rows input[type=checkbox]'));
+
+    // case 1) 체크박스가 모두 체크가 되어있는지?
+    // const isAllChecked = $arr.every(ele => ele.checked == true);
+
+    // case 2) 체크박스가 하나라도 체크가 되어있는지?
+    const isSomeChecked = $arr.some(ele => ele.checked == true);
+
+    // case 1)
+    // if(isAllChecked) {
+    //   $arr.forEach(ele=> ele.checked = false); // 모든 체크박스 해제
+    // } else {
+    //   $arr.forEach(ele=> ele.checked = true); // 모든 체크박스를 체크
+    // }
+
+    // case 2)
+    if(isSomeChecked) {
+      $arr.forEach(ele=> ele.checked = false); // 일부 체크박스 uncheck
+    } else {
+      $arr.forEach(ele=> ele.checked = true); // 모든 체크박스를 check
+    }
+
+  });
+
+</script>
+
+
+</body>
+</html>

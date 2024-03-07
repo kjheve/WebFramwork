@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title th:text="#{title.member.join}">Member Join</title>
+</head>
+
+<body>
+  <h3>회원가입</h3>
+  <form id="frm" action="/members/join" method="POST">
+    <p>
+      <input type="text" id="email" name="email" placeholder="이메일">
+      <button type="button" id="dupchkBtn">중복체크</button>
+      <span class="errmsg" id="errmsg_email"></span>
+    </p>
+    <p><input type="password" name="passwd" placeholder="비밀번호"></p>
+    <p><input type="password" placeholder="비밀번호확인"></p>
+    <p><input type="text" name="nickname" placeholder="닉네임"></p>
+    <p><button id="joinBtn">가입</button></p>
+  </form>
+
+  <script>
+
+    const $email = document.getElementById('email');
+
+    const $frm = document.getElementById('frm');
+    $frm.addEventListener('submit', evt => {
+      evt.preventDefault(); // submit 차단
+      // 이메일 중복 체크 확인
+      if (!email.dataset.dupchk || email.dataset == 'ok') { // ok면 return
+        document.getElementById('errmsg_email').textContent = '이메일 중복체크 하셈';
+        return;
+      }
+      // nok이면
+      evt.currentTarget.submit(); // submit();
+    });
+
+    const $dupchkBtn = document.getElementById('dupchkBtn');
+    $dupchkBtn.addEventListener('click', evt => {
+      console.log('중복체크');
+      // 중복체크할 때 email값을 필수로 입력 하겠끔
+      if ($email.value.trim().length == 0) {
+        document.getElementById('errmsg_email').textContent = '이메일 입력바람';
+        $email.focus();
+        return;
+      }
+      dupchk(); // 중복체크 함수 호출
+    });
+
+    async function dupchk() {
+      const email = {};
+      email['email'] = $email.value;
+      const url = `/api/members/dupchk`;
+      const options = {
+        method: 'POST',
+        headers: {
+          'accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        // body: `{ "email" : "xxx" }`
+        body: JSON.stringify(email)
+      }
+      const response = await fetch(url, options);
+      const msgBody = await response.json();
+
+      if (msgBody.header.rtcd === '21') {
+        console.log('email 존재(exits)');
+        document.getElementById('errmsg_email').textContent = '존재하는 Email 입니다';
+        $email.dataset.dupchk = 'ok'       // 사용자 정의 속성
+        $email.focus();
+      } else {
+        console.log('email 없음(none)')
+        document.getElementById('errmsg_email').textContent = '사용가능한 Email 입니다';
+        $email.dataset.dupchk = 'nok'      // 사용자 정의 속성
+        $email.setAttribute('readonly', true); // 이메일 텍스트박스 읽기 전용으로 설정
+        $email.style.background = '#EFE23F';
+        $dupchkBtn.disabled = true;  // 중복체크버튼 비활성화
+      }
+    }
+
+  </script>
+
+</body>
+
+</html>

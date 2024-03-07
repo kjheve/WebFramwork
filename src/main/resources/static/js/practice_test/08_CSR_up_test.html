@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <li>내용1
+    <button>수정</button>
+    <button>삭제</button>
+    내용2
+  </li>
+
+  <script>
+    const $li = document.querySelector('li');
+    $li.addEventListener('click', evt => {
+      console.log(evt.target.closest('li').textContent);
+      console.log(evt.target.closest('li').innerHTML);
+      console.log(evt.target.closest('li').innerText);
+      const str = evt.target.closest('li').innerText;
+      const strArr = str.split(' ');
+      console.log(strArr);
+      console.log(strArr[0]);
+      console.log(strArr[strArr.length-1]);
+      
+      console.log("-------------------");
+      
+      console.log(evt.target.closest('li').firstElementChild); // <button>
+      console.log(evt.target.closest('li').firstElementChild.textContent); // 수정
+
+      console.log(evt.target.closest('li').firstChild); // text :
+      console.log(evt.target.closest('li').firstChild.nodeValue); // 내용1
+
+      console.log(evt.target.closest('li').lastElementChild); // <button>
+      console.log(evt.target.closest('li').lastElementChild.textContent); // 수정
+
+      console.log(evt.target.closest('li').lastChild); // text :
+      console.log(evt.target.closest('li').lastChild.nodeValue); // 내용1
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>$Title$</title>
+</head>
+
+<body>
+  <a href="/b?name=gildong&age=20">클릭</a>
+  <form action="" method="GET">
+    <input type="text" name="name" id="">
+    <input type="text" name="age" id="">
+    <input type="submit" value="전송"> <!-- 요청메세지 생성 -->
+    <input type="reset" value="취소"> <!-- 입력값 취소 -->
+    <input type="button" value="전송1"> <!-- 이벤트(X) -->
+    <button type="submit">버튼1</button>
+    <button type="reset">버튼2</button>
+    <button type="button">버튼3</button>
+  </form>
+  <!--  button 엘리먼트
+    1. button 태그는 html 5에서 등장함(시멘틱 태그)
+    2. form태그 안에서 type의 기본값은 submit
+       form 태그 밖에서는 type의 기본값은 button
+   -->
+  <div><button type="button">버튼4</button></div>
+
+  <script>
+    const $a = document.querySelector('a');
+    $a.addEventListener('click', evt => {
+      console.log(evt);
+      evt.preventDefault();
+      if (confirm('이동하시겠습니까?')) {
+        console.log('이동');
+        location.href = evt.target.href;
+      } else {
+        console.log('이동취소');
+      }
+    });
+  </script>
+</body>
+
+</html>

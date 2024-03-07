@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>주식 배당 정보</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f8f8f8;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h3 {
+      font-size: 24px;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    form {
+      display: flex;
+      align-items: center;
+    }
+
+    label {
+      font-size: 18px;
+      color: #555;
+      margin-right: 10px;
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+      flex: 1;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th,
+    td {
+      border: 1px solid #dddddd;
+      text-align: center;
+      padding: 10px;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    tbody tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+  </style>
+</head>
+
+<body>
+  <h3>정보 확인할 주식명 검색</h3>
+  <div class="container">
+    <form action="/pubdata/divide/search" method="GET">
+      <label for="search">검색어</label>
+      <input id="search" type="text" name="keyword">
+      <button id="searchBtn" type="button">검색</button>
+    </form>
+  </div>
+  <div class="container">
+    <p>검색결과</p>
+    <table>
+      <thead>
+        <tr>
+          <th>배당기준일자</th>
+          <th>주식발행회사명</th>
+          <th>주식일반배당금액(1주당배당금액)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- <tr>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr> -->
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    searchBtn.addEventListener('click', evt => {
+      evt.preventDefault();
+      const keyword = search.value;
+      const url = `/pubdata/divide/search?keyword=${keyword}`;
+      const option = {
+        method: 'GET'
+      };
+      fetch(url, option).then(res => {
+        if (!res.ok) {
+          throw new Error('응답오류발생');
+        }
+        return res.json();
+      }).then(data => {
+        console.log(data);
+        makeHtml(data);
+      }).catch(error => console.error('오류', error));
+    });
+
+    function makeHtml(res) {
+      const $tbody = document.querySelector('tbody');
+      let html = '';
+      const arr = res.response.body.items.item;
+      console.log(arr);
+      arr.forEach(stock => {
+        html +=
+          ` <tr>
+              <td>${stock.dvdnBasDt}</td>
+              <td>${stock.stckIssuCmpyNm}</td>
+              <td>${stock.stckGenrDvdnAmt}</td>
+            </tr> `;
+      });
+      $tbody.innerHTML = html;
+    }
+  </script>
+</body>
+
+</html>

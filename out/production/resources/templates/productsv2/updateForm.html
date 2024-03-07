@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>상품수정</title>
+  <!-- async 속성 : html dom트리 형성후 수행됨 -->
+  <script src="/js/product/updateForm.js" async></script>
+  <style>
+    .err-msg {
+    display:none;
+    color:red;
+    font-size:0.8em;
+    font-style: italic;
+  }
+    .err-msg.on{
+    display:inline-block;
+  }
+  </style>
+</head>
+<body>
+  <h3>상품수정</h3>
+  <!--★action 속성값에 값이 없는 경우 가장 최근에 client 요청했던 url 값으로 반영된다.-->
+  <form action="" method="post" th:object="${product}">
+    <div th:if="${s_err_global != null and #strings.length(s_err_global) > 0}">
+      <span class="err-msg" th:class="'err-msg on'" th:text="${s_err_global}">errGlobal(S)</span>
+    </div>
+    <div>
+      <label for="productId">상품번호</label><input id="productId" name="productId" type="text" th:value="*{productId}" readonly>
+    </div>
+    <div>
+      <label for="pname">상품명</label><input id="pname" name="pname" type="text" th:value="*{pname}">
+      <span class="err-msg" th:if="${s_err_pname != ''}" th:class="'err-msg on'" th:text="${s_err_pname}">errPname(Server)</span>
+    </div>
+    <div>
+      <label for="quantity">수량</label><input id="quantity" name="quantity" type="text" th:value="*{quantity}">
+      <span class="err-msg" th:if="${s_err_quantity != ''}" th:class="'err-msg on'" th:text="${s_err_quantity}">errquantity(Server)</span>
+    </div>
+    <div>
+      <label for="price">가격</label><input id="price" name="price" type="text" th:value="*{price}">
+      <span class="err-msg" th:if="${s_err_price != ''}" th:class="'err-msg on'" th:text="${s_err_price}">errprice(Server)</span>
+    </div>
+    <div>
+      <input id="resetBtn" type="reset" value="취소">
+      <input id="updateBtn" type="submit" value="저장">
+      <input id="listBtn" type="button" value="목록">
+    </div>
+  </form>
+</body>
+</html>

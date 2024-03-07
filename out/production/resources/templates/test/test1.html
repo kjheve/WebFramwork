@@ -1,0 +1,60 @@
+<!-- 타임리프 연습을 위해서 생성함 -->
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>$Title$</title>
+</head>
+<body>
+  <div th:with="name='홍길동'">
+    <span th:text="${name}"></span>
+    <span th:text="반갑습니다"></span>
+    <span>[[${name}]]</span>
+    <span>[['반갑습니다']]</span>
+  </div>
+
+  <div>
+    <span th:text="'<span>hi</span>'"></span>
+    <span th:utext="'<span>hi</span>'"></span>
+  </div>
+
+<!-- HTML 주석과 Thymeleaf 주석의 차이 -->
+<!--  <div th:text="'KH인재교육원'"></div>-->
+<!--/* <div th:text="'KH인재교육원'"></div> */-->
+
+<!-- 컨트롤러의 Model 객체에서 가지고 옴 -->
+  <div>
+    <p th:text="${key1}"></p>
+    <p th:text="${key2}"></p>
+    <p th:text="${key3}"></p>
+  </div>
+
+  <!--if와 unless-->
+  <p th:if="true">24년2월8일</p>
+  <p th:if="false">Thymeleaf 공부중</p>
+
+  <p th:unless="true">24년2월8일</p>
+  <p th:unless="false">Thymeleaf 공부중</p>
+
+  <th:block th:with="hobby='축구'">
+    <div th:switch="${hobby}">
+      <p th:case="축구" th:text="축구"></p> <!--/* 띄워쓰기를 하면 ''로 묶어야함 */-->
+      <p th:case="농구" th:text="농구"></p>
+    </div>
+  </th:block>
+
+  <!-- 반복문(Iteration) th:each -->
+  <div th:each="person:${persons}">
+      <span th:text="${person.name}"></span>
+      <span th:text="${person.age}"></span>
+  </div>
+
+  <p th:text="${1+1}"></p>
+  <p th:text="${1>2}"></p>
+  <p th:text="${ not((1 > 2) and (2 < 3)) }"></p>
+
+</body>
+</html>
+

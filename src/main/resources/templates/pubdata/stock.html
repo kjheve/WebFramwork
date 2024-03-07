@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>주식 가격정보</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* 컨테이너 스타일 */
+    .container {
+      margin: 20px auto;
+      padding: 20px;
+      max-width: 800px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background-color: #f9f9f9;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* 검색 영역 스타일 */
+    .container h3 {
+      margin-top: 0;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #ccc;
+    }
+
+    /* 입력 필드 레이블 스타일 */
+    label {
+      display: inline-block;
+      margin-bottom: 5px;
+    }
+
+    /* 입력 필드 스타일 */
+    input[type="text"],
+    input[type="date"] {
+      display: inline-block;
+      /* 인라인 요소로 변경하여 한 줄에 표시 */
+      width: calc(33.33% - 10px);
+      /* 각 입력 필드가 33.33% 너비를 차지하고 간격을 조정 */
+      padding: 8px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+      /* 패딩, 보더를 포함한 크기 계산 */
+      margin-right: 10px;
+      /* 오른쪽 여백 추가 */
+    }
+
+    /* 검색 버튼 스타일 */
+    button {
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    /* 결과 테이블 스타일 */
+    #resultTable {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    #resultTable th,
+    #resultTable td {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    #resultTable th {
+      background-color: #007bff;
+      color: #fff;
+      text-align: left;
+    }
+
+    #resultTable tbody tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    #resultTable tbody tr:hover {
+      background-color: #e2e2e2;
+    }
+
+    .result-container {
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #f2f2f2;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    strong {
+      font-weight: bold;
+      color: #007bff;
+      margin-right: 5px;
+    }
+
+    span {
+      color: #666;
+    }
+
+    /* 숫자는 오른쪽, 문자는 왼쪽정렬 */
+    .cell.num {
+      text-align: right;
+    }
+
+    .cell.str {
+      text-align: left;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h3>주식 검색</h3>
+    <form action="/pubdata/stock/search" method="GET">
+      <div>
+        <label for="itmsNm">종목명</label>
+        <input id="itmsNm" type="text" name="itmsNm">
+      </div>
+      <div>
+        <label for="beginBasDt">시작일</label>
+        <input id="beginBasDt" type="date" name="beginBasDt">
+      </div>
+      <div>
+        <label for="endBasDt">종료일</label>
+        <input id="endBasDt" type="date" name="endBasDt">
+      </div>
+      <button id="searchBtn" type="button">검색</button> <!--/* type="button"이 없으면 submit이라서 type지정 */-->
+    </form>
+  </div>
+  <div class="container">
+    <div class="result-container">
+      <strong></strong><span>검색결과</span>
+    </div>
+    <table id="resultTable">
+      <thead>
+        <tr>
+          <th>기준일자</th>
+          <th>시가</th>
+          <th>저가</th>
+          <th>고가</th>
+          <th>종가</th>
+          <th>대비</th>
+          <th>등락률</th>
+          <th>거래량</th>
+          <th>거래대금</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- <tr>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr> -->
+      </tbody>
+    </table>
+    <!-- 페이징 -->
+    <div id="pagination"></div>
+  </div>
+
+
+  <script type="module">
+    import { Pagination } from '/js/common.js';
+    //페이징 객체 생성
+    const pagination = new Pagination(10, 10); // 한페이지에 보여줄 레코드건수,한페이지에 보여줄 페이지수
+
+    // input:date에 시작일에 이번달의 1일 / 종료일에 오늘 / 초기값으로 설정하기
+    const today = new Date(); // 오늘
+    beginBasDt.valueAsDate = new Date(today.getFullYear(), today.getMonth(), 2); // 시작일
+    endBasDt.valueAsDate = today; // 종료일
+
+    // 검색영역 엔터 이벤트
+    itmsNm.addEventListener('keydown', evt => {
+      if (evt.key == 'Enter') {
+        evt.preventDefault(); // 기본 동작 중지
+        callStockData();
+      }
+    });
+
+    // 검색버튼 클릭 이벤트
+    searchBtn.addEventListener('click', callStockData);
+
+    // 이벤트 함수 ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+    function callStockData() {
+      const $begin = document.getElementById('beginBasDt');
+      const $end = document.getElementById('endBasDt');
+
+      const keyword = itmsNm.value;
+      // Split과 join을 이용하여 ex) 2024-02-22를 20240222로 문자열 변환
+      const beginBasDt = $begin.value.split('-').join('');
+      const endBasDt = $end.value.split('-').join('');
+      // 사용자 정의 함수를 이용하여 문자열 변환♠
+      // const beginBasDt = formatDate($begin.value);
+      // const endBasDt = formatDate($end.value);
+      // const url = `/pubdata/stock/search?keyword=${keyword}&beginBasDt=${beginBasDt}&endBasDt=${endBasDt}`; // 페이징 추가하면서 아래 코드로 사용
+      const pageNo = pagination.currentPage;
+      const numOfRows = pagination.recordsPerPage; // 한 페이지에 보여줄 레코드 수
+      const url = `/pubdata/stock/search?itmsNm=${keyword}&beginBasDt=${beginBasDt}&endBasDt=${endBasDt}&pageNo=${pageNo}&numOfRows=${numOfRows}`;
+      const option = {
+        method: 'GET',
+      };
+      fetch(url, option)
+        .then(res => {
+          if (!res.ok) {
+            throw new Error('응답오류발생');
+          }
+          // console.log(res.json());
+          return res.json();//응답메시지 바디를 읽어서 json포맷문자열=>js객체로 변환
+        })
+        .then(data => {
+          console.log(data);
+          makeHtml(data);
+        })
+        // .then(makeHtml)
+        .catch(error => console.error('오류 : ', error));
+    }
+
+    // html 쏴주는 함수 --------------------- ★★ --------------------------
+    function makeHtml(res) {
+      const $tbody = document.querySelector('tbody');
+      let html = '';
+      const arr = res.response.body.items.item; // json 객체에 접근
+
+      if (arr.length == 0) {
+        html =
+          `<tr>
+            <span>조회결과가 없습니다.<span>
+          </tr>`;
+      }
+
+      arr.forEach(stock => {
+        // 시가, 저가, 고가, 종가 값 가져오기
+        const mkp = numberWithCommas(stock.mkp);
+        const lopr = numberWithCommas(stock.lopr);
+        const hipr = numberWithCommas(stock.hipr);
+        const clpr = numberWithCommas(stock.clpr);
+
+        // 등락률과 대비 값 가져오기
+        const fltRt = parseFloat(stock.fltRt);
+        const vs = parseFloat(stock.vs);
+
+        // 거래량
+        const trqu = numberWithCommas(stock.trqu);
+        // 거래대금 값 가져오기
+        const trPrc = numberWithBillions(stock.trPrc);
+
+        // 등락률이 양수인지 음수인지에 따라 색상 설정
+        let fltRtColor = '';
+        if (fltRt > 0) {
+          fltRtColor = 'red'; // 양수면 빨간색
+        } else if (fltRt < 0) {
+          fltRtColor = 'blue'; // 음수면 파란색
+        }
+
+        // 대비가 양수인지 음수인지에 따라 색상 설정
+        let vsColor = '';
+        if (vs > 0) {
+          vsColor = 'red'; // 양수면 빨간색
+        } else if (vs < 0) {
+          vsColor = 'blue'; // 음수면 파란색
+        }
+
+        // 테이블 행 추가
+        html +=
+          `<tr>
+            <td class="cell num">${stock.basDt}</td>
+          <td class="cell num">${mkp}</td>
+          <td class="cell num">${lopr}</td>
+          <td class="cell num">${hipr}</td>
+          <td class="cell num">${clpr}</td>
+          <td class="cell num" style="color: ${fltRtColor};">${stock.vs}</td>
+          <td class="cell num" style="color: ${vsColor};">${stock.fltRt}</td>
+          <td class="cell num">${trqu}</td>
+          <td class="cell str">${trPrc}</td>
+    </tr>`;
+
+        // 검색결과에 strong 태그 content로 종목명 넣기
+        const $strong = document.querySelector('strong');
+        $strong.textContent = stock.itmsNm;
+      });
+
+      // tbody에 html 추가
+      $tbody.innerHTML = html;
+
+      //총건수는 초기 1회만
+      const totalCount = res.response.body.totalCount;
+      pagination.setTotalRecords(totalCount);
+      pagination.displayPagination(callStockData);
+    }
+    // --------------------- ★★ --------------------------------------------------------
+
+    // 돈 단위 구분하여 표기하는 함수
+    function numberWithCommas(x) {
+      return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
+    // 거래대금을 'xxx억원'으로 표기하는 함수
+    function numberWithBillions(x) {
+      const billions = x / 100000000; // 억 단위로 변환
+      return billions.toFixed(0) + '억원'; // 소수점 이하 자리를 버리고 '억원' 문자열 추가
+    }
+
+    // input:date 타입을 "YYYY/MM/DD" 형식으로 변환하는 함수
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      const year = date.getFullYear();
+      const month = (date.getMonth() + 1).toString().padStart(2, '0'); // 월은 0부터 시작하므로 +1 해줘야 함
+      const day = date.getDate().toString().padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+  </script>
+</body>
+
+</html>

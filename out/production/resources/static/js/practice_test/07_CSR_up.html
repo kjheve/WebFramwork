@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>등록/수정/삭제</title>
+  <style>
+  </style>
+</head>
+
+<body>
+
+  <textarea name="" id="textarea" cols="30" rows="3"></textarea>
+  <button class="addBtn">등록</button>
+
+  <ul class="list">
+    <li class="item item1">내용1
+      <button class="editBtn">수정</button>
+      <button class="delBtn">삭제</button>
+    </li>
+    <li class="item item2">내용2
+      <button class="editBtn">수정</button>
+      <button class="delBtn">삭제</button>
+    </li>
+    <li class="item item3">내용3
+      <button class="editBtn">수정</button>
+      <button class="delBtn">삭제</button>
+    </li>
+  </ul>
+
+  <script>
+    const $list = document.querySelector('.list'); // list
+    const $textarea = document.getElementById('textarea'); // textarea
+    const $addBtn = document.querySelector('.addBtn'); // 등록버튼
+    const $editBtn = document.querySelector('.editBtn'); // 수정버튼
+    const $delBtn = document.querySelector('.delBtn'); // 삭제버튼
+
+    // 1) 등록버튼
+    let cnt = 1;
+    $addBtn.addEventListener('click', evt => {
+      const $li = document.createElement('li');
+      // $li.className = `item item${cnt}`;
+      $li.setAttribute('class', `item item${cnt}`);
+      $li.innerHTML = `${$textarea.value}
+      <button class="editBtn">수정</button>
+      <button class="delBtn">삭제</button>`;
+      $textarea.value = '';
+      // $list.appendChild($li);
+      $list.insertAdjacentElement('afterbegin', $li);
+      cnt++;
+    });
+
+    // 2) 수정버튼
+    $list.addEventListener('click', evt => {
+      if (evt.target.className === 'editBtn') {
+        const $li_original = evt.target.closest('li'); // 부모 태그 li 타겟팅
+        const $li_replace = document.createElement('li');
+        const original_class = $li_original.getAttribute('class');
+        $li_replace.setAttribute('class', original_class);
+
+        // case 1) button의 텍스트 가져오지 않기
+        // 텍스트 노드를 포함한 자식 노드 중에서 텍스트 노드만 필터링하여 가져옴
+        // const original_text = Array.from($li_original.childNodes)
+        //   .filter(node => node.nodeType === Node.TEXT_NODE)
+        //   .map(node => node.textContent)
+        //   .join('').trim();
+
+        // case 2) button의 텍스트 가져오지 않기
+        // li 요소의 자식 노드를 반복하여 텍스트 노드만 가져오기
+        // let original_text = '';
+        // $li_original.childNodes.forEach(ele => {
+        //   if (ele.nodeType === Node.TEXT_NODE) {
+        //     original_text += ele.textContent.trim(); // 텍스트 노드의 텍스트를 추가
+        //   }
+        // });
+
+        // case 3) 08_CSR_up_test.html 를 배우고 코드 작성
+        const original_text= $li_original.firstChild.nodeValue.trim();
+
+        $li_replace.innerHTML =
+          `<input type="text" value="${original_text}">
+          <button class="saveBtn">저장</button>
+          <button class="cancelBtn">취소</button>`;
+        $li_original.replaceWith($li_replace);
+
+        // 2-1) 취소 버튼
+        const $cancelBtn = document.querySelector('.cancelBtn');
+        $cancelBtn.addEventListener('click', evt => {
+          $li_replace.replaceWith($li_original);
+        });
+
+        // 2-2) 저장 버튼
+        const $saveBtn = document.querySelector('.saveBtn');
+        $saveBtn.addEventListener('click', evt => {
+          const edited_text = $li_replace.querySelector('input').value; // 수정된 내용 가져오기
+          $li_original.innerHTML =
+            `${edited_text}
+              <button class="editBtn">수정</button>
+              <button class="delBtn">삭제</button>`;
+          $li_replace.replaceWith($li_original); // 저장 후 원래 상태로 되돌리기
+        });
+
+      }
+    });
+
+    // 3) 삭제버튼
+    $list.addEventListener('click', evt => {
+      // console.log(evt);
+      if (evt.target.className === 'delBtn') {
+        const $delLi = evt.target.closest('li');
+        $delLi.remove();
+      }
+    });
+
+  </script>
+
+</body>
+
+</html>

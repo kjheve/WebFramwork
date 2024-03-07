@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>$Title$</title>
+</head>
+<body>
+TEST2
+<h3>GET 방식</h3>
+<a href="/test/product?pname=컴퓨터&price=100">클릭1(쿼리파라미터)</a>
+<a href="/test/product/컴퓨터/100">클릭2(경로상)</a>
+<form action="/test/product" method="GET">
+  <input type="text" name="pname">
+  <input type="text" name="price">
+  <input type="submit" value="전송">
+</form>
+
+<button type="button" id="getBtn">클릭3</button>
+<button type="button" id="getBtn2">클릭4</button>
+
+<h3>POST 방식</h3>
+<form action="/test/product" method="POST">
+  <input type="text" name="pname">
+  <input type="text" name="price">
+  <input type="submit" value="전송">
+</form>
+
+<script>
+  const $getBtn = document.getElementById('getBtn');
+  $getBtn.addEventListener('click', evt => {
+    const pname = '컴퓨터';
+    const price = '300';
+    location.href = `/test/product?pname=${pname}&price=${price}`;
+  });
+
+  const $getBtn2 = document.getElementById('getBtn2');
+  $getBtn2.addEventListener('click', evt => {
+    const pname = '노트북';
+    const price = '200';
+    location.href = `/test/product/${pname}/${price}`;
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,10 @@
+#delModal::backdrop {
+  background-color: rgba(99, 100, 255, 0.2);
+}
+#delModal {
+  border: none;
+  outline: none;
+  border-radius: 5%;
+  background-color: rgba(99, 100, 255, 0.5);
+  box-shadow: 5px 5px 3px 1px gray;
+}

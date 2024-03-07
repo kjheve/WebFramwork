@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>상품수정</title>
+  <!-- async 속성 : html dom트리 형성후 수행됨 -->
+  <script src="/js/product/updateForm.js" async></script>
+</head>
+<body>
+  <h3>상품수정</h3>
+  <!--★action 속성값에 값이 없는 경우 가장 최근에 client 요청했던 url 값으로 반영된다.-->
+  <form action="" method="post">
+    <div><label for="productId">상품번호</label><input id="productId" type="text" th:value="${product.productId}" readonly></div>
+    <div><label for="pname">상품명</label><input id="pname" name="pname" type="text" th:value="${product.pname}"></div>
+    <div><label for="quantity">수량</label><input id="quantity" name="quantity" type="text" th:value="${product.quantity}"></div>
+    <div><label for="price">가격</label><input id="price" name="price" type="text" th:value="${product.price}"></div>
+    <div>
+      <input id="resetBtn" type="reset" value="취소">
+      <input id="updateBtn" type="submit" value="저장">
+      <input id="listBtn" type="button" value="목록">
+    </div>
+  </form>
+</body>
+</html>

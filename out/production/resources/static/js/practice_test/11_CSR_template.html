@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <textarea name="" id="comment" cols="30" rows="3"></textarea>
+  <button class="addBtn">등록</button>
+  <div id="commentErrMsg"></div>
+  <ul class="list">
+    <!-- <li class="item item1">내용1 <button>수정</button><button>삭제</button></li>
+    <li class="item item2">내용2 <button>수정</button><button>삭제</button></li>
+    <li class="item item3">내용3 <button>수정</button><button>삭제</button></li> -->
+  </ul>
+
+  <template id="readMode">
+    <li class="item read"><span class="reply"></span>
+      <button class="modifyBtn">수정</button>
+      <button class="delBtn">삭제</button>
+    </li>
+  </template>
+
+  <template id="modifyMode">
+    <li class="item edit">
+      <input type="text">
+      <button class="saveBtn">저장</button>
+      <button class="cancelBtn">취소</button>
+    </li>
+  </template>
+
+  <dialog id="delModal">
+    <p>삭제하시겠습니까?</p>
+    <form action="" method="dialog">
+      <button id="cancelBtn">취소</button>
+      <button id="delItemBtn">삭제</button>
+    </form>
+  </dialog>
+
+  <!-- 
+  <template id="err">
+    <p class="errmsg"></p>
+  </template> -->
+
+  <script>
+
+    let replyNumber = 0; // 댓글번호
+    // 등록 -------------------------------------------------------------------
+    document.querySelector('.addBtn').addEventListener('click', evt => {
+      // 1) 유효성체크
+      if (comment.value.trim().length < 3) {
+        // alert('3글자 이상 입력 바람');
+        commentErrMsg.textContent = '3글자 이상 입력 바랍니다.';
+        return;
+      } else {
+        commentErrMsg.textContent = '';
+      }
+      
+      // 2) 등록처리
+      // console.log(readMode.content.cloneNode(true));
+      const $readModeLi = readMode.content.cloneNode(true).querySelector('li');  // true를 이용하여 깊은복제
+      
+      // 댓글번호◎
+      $readModeLi.dataset.replyNumber = ++replyNumber;
+
+      $readModeLi.querySelector('.reply').textContent = comment.value;
+      document.querySelector('.list').appendChild($readModeLi);
+      comment.value = '';
+      comment.focus();
+
+
+    });
+
+    // .list 밑의 버튼 클릭시 이벤트 ------------------------------------------
+    document.querySelector('.list').addEventListener('click', evt => {
+      // console.log(evt.target);
+      if (evt.target.tagName !== 'BUTTON') { return; } // 버튼이 아닌값들은 return 함
+      // console.log(evt.target);
+      switch (evt.target.classList[0]) { // 클래스의 값을 switch문으로
+        case "modifyBtn": // 수정 버튼
+          modify(evt);
+          break;
+        case "delBtn": // 삭제 버튼
+          del(evt);
+          break;
+        case "saveBtn": // 저장 버튼
+          save(evt);
+          break;
+        case "cancelBtn": // 취소 버튼
+          cancel(evt);
+          break;
+      }
+    });
+
+    function modify(e) { // 수정
+      console.log("수정");
+      // 1) 수정모드 li를 찾아서 취소
+      // document.querySelector('.list li.edit').querySelector('.cancelBtn').click(); // null값일 수도 있어서 optional 사용
+      document.querySelector('.list li.edit')?.querySelector('.cancelBtn').click(); // optional chaining 적용 => ?.
+
+      // 2) 수정모드 클릭한 것은 그대로 진행
+      const $readModeLi = e.target.closest('li');
+      const $modifyModeLi = modifyMode.content.cloneNode(true).querySelector('li');
+      $modifyModeLi.querySelector('input').value = $readModeLi.querySelector('.reply').textContent;
+
+      $modifyModeLi.dataset.replyNumber = $readModeLi.dataset.replyNumber; // 댓글번호◎
+
+      // 사용자 정의 속성을 이용하여 이전 데이터 저장 ★★★
+      // input 태그 속성에 'data-old-text="값"' 으로 저장됨
+      // => 취소할 때 이전 데이터 불러오기 위해서
+      $modifyModeLi.querySelector('input').dataset.oldText = $readModeLi.querySelector('.reply').textContent;
+
+      $readModeLi.replaceWith($modifyModeLi);
+    }
+
+    function del(e) { // 삭제
+      console.log("삭제");
+      $delModal.showModal(); // 모달창 띄우기
+
+      $delModal.dataset.replyNumber = e.target.closest('li').dataset.replyNumber; // 댓글번호◎
+
+      // e.target.closest('li').remove(); // 모달창에서 처리되게, 하지만 모달창은 e객체를 받을 방법이 없음 => 댓글번호◎ 생성함..
+    }
+
+    function save(e) { // 저장
+      console.log("저장");
+      const $readModeLi = readMode.content.cloneNode(true).querySelector('li');
+      const $modifyModeLi = e.target.closest('li');
+
+      $readModeLi.dataset.replyNumber = $modifyModeLi.dataset.replyNumber; // 댓글번호◎
+
+      $readModeLi.querySelector('.reply').textContent = $modifyModeLi.querySelector('input').value;
+      $modifyModeLi.replaceWith($readModeLi);
+    }
+
+    function cancel(e) { // 취소
+      console.log("취소");
+      const $readModeLi = readMode.content.cloneNode(true).querySelector('li');
+      const $modifyModeLi = e.target.closest('li');
+
+      $readModeLi.dataset.replyNumber = $modifyModeLi.dataset.replyNumber; // 댓글번호◎
+
+      $readModeLi.querySelector('.reply').textContent = $modifyModeLi.querySelector('input').dataset.oldText;
+      $modifyModeLi.replaceWith($readModeLi);
+    }
+
+    /* ---------- 모달창 ---------------------------------------------*/
+    const $delModal = document.getElementById('delModal');    //삭제 모달창
+    const $cancelBtn = document.getElementById('cancelBtn');   //취소버튼 모달창
+    const $delItemBtn = document.getElementById('delItemBtn'); //삭제버튼 모달창
+
+    $delModal.addEventListener('close', evt => {
+      if ($delModal.returnValue == 'ok') {
+        const replyNumber = evt.currentTarget.dataset.replyNumber;
+        const $lis = document.querySelectorAll('.list .item'); // li요소들
+        const findedIdx = Array.from($lis).findIndex(li => li.dataset.replyNumber == replyNumber);
+        $lis[findedIdx].remove();
+      }
+    });
+
+    // 취소버튼 모달창
+    $cancelBtn.addEventListener('click', evt => {
+      $delModal.close('cancel');
+    });
+
+    // 삭제버튼 모달창
+    $delItemBtn.addEventListener('click', evt => {
+      $delModal.close('ok');
+    });
+
+  </script>
+</body>
+
+</html>

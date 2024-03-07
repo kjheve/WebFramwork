@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!--VSCode용-->
+  <!-- <script src="/static/js/product/products.js"></script> -->
+</head>
+
+<body>
+  <!-- <div>
+    <form id="frm" action="">
+      <div>
+        <label for="">상품명</label>
+        <input type="text" name="productId" id="productId">
+      </div>
+      <div>
+        <label for="">수량</label>
+        <input type="text" name="quantity" id="quantity">
+      </div>
+      <div>
+        <label for="">가격</label>
+        <input type="text" name="price" id="price">
+      </div>
+      <div><button id="addBtn" type="button">등록</button></div>
+    </form>
+  </div>
+  <div id="productList"></div> -->
+
+
+  <script>
+    // title 엘리먼트
+    const $title = document.createElement('title')
+    $title.textContent = '상품관리';
+
+    // script 엘리먼트
+    const $script = document.createElement('script');
+    $script.src = `/js/product/products.js`;
+    $script.async = true;
+
+    document.head.appendChild($title)  
+    document.head.appendChild($script);  
+  </script>
+</body>
+
+</html>

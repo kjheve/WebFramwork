@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>수정, 삭제 연습</title>
+  <style>
+    .list>div {
+      display: flex;
+    }
+  </style>
+</head>
+
+<body>
+  <ul class="list">
+    <li class="item item1">내용1</li>
+    <li class="item item2">내용2</li>
+    <li class="item item3">내용3</li>
+  </ul>
+
+
+  <script>
+
+    const $list = document.querySelector('.list');
+
+    // 1) 내용4를 텍스트 컨텐트로 하는 li 엘리먼트를
+    //    내용1과 내용2 사이에 삽입하기
+    // <li class="item item4">내용4</li>
+
+    const $li4 = document.createElement('li');  // <li></li>
+    // $li.className = 'item item4';  // <li class="item item4"></li> 
+    $li4.setAttribute('class', 'item item4');
+    $li4.textContent = "내용4"; // <li class="item item4">내용</li>
+
+    const $li1 = document.querySelector('.item.item1');
+    $li1.insertAdjacentElement('afterend', $li4);
+
+
+    // 2) 내용3을 삭제하기
+    // document.querySelector('.item.item3').remove();
+    const $li3 = document.querySelector('.item.item3');
+    $li3.remove();
+
+    // 3) 내용1을 내용5로 대체하기
+    // <li class="item item5">내용5</li>
+    const $li5 = document.createElement('li');
+    $li5.setAttribute('class', 'item item5');
+    $li5.textContent = '내용5'
+    document.querySelector('.item.item1').replaceWith($li5);
+
+    // 4) 내용2을
+    // <li class="item item2"><input type="text" value="내용2"></li>
+    // case 1)
+    // const $inputText = document.createElement('input');
+    // $inputText.setAttribute('type', 'text');
+    // const $li2 = document.querySelector('.item.item2');
+    // // $inputText.value = $li2.textContent;  // 방법1
+    // $inputText.setAttribute('value', $li2.textContent); // 방법2
+    // $li2.textContent = '';
+    // $li2.appendChild($inputText);
+
+    // case 2)
+    const $li2_old = document.querySelector('.item.item2');
+    const $li2_new = document.createElement('li');
+    $li2_new.setAttribute('class', 'item item2');
+    $li2_new.innerHTML = `<input type="text" value="${$li2_old.textContent}">`;
+
+    $li2_old.replaceWith($li2_new);
+
+
+  </script>
+</body>
+
+</html>

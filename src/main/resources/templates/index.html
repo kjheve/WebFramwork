@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Title</title>
+</head>
+
+<body>
+  <h3>Hello world~ (danamic) </h3>
+
+  <!-- 로그인 했을 때 보여지는 화면 -->
+  <th:block th:if="${session.loginMember}">
+    <!-- JAVA 로그인처리에 세션에 정보를 가져왔을 경우-->
+    <p th:text="${session.loginMember.nickname}"></p>
+
+    <ul>
+      <!--a 태그는 GET방식의 URL을 만들어냄-->
+      <!--자바스크립트에서는 location.href-->
+      <li><a href="/products">상품관리 - SSR</a></li>
+      <li><a href="/api/view/products">상품관리 - CSR</a></li>
+      <li><a href="/pubdata/stock">주식검색</a></li>
+      <!-- <li><a href="/pubdata/divide">배당금검색</a></li> -->
+      <li><a href="#" id="logoutBtn">로그아웃</a></li>
+    </ul>
+
+  </th:block>
+
+  <!-- 로그인 안했을 때 보여지는 화면 -->
+  <th:block th:unless="${session.loginMember}">
+    <ul>
+      <li><a href="/pubdata/news">뉴스검색</a></li>
+      <li><a href="/members/join">회원가입</a></li>
+      <li><a href="/login">로그인</a></li>
+    </ul>
+  </th:block>
+
+  <script>
+    const $logoutBtn = document.getElementById('logoutBtn');
+    $logoutBtn?.addEventListener('click', evt => {
+      evt.preventDefault(); // 기본 이벤트 제거
+
+      fetch('/logout', { method: 'POST', body: null })
+        .then(res => res.text())
+        .then(res => {
+          if (res === 'OK') { location.href = '/'; }
+        })
+        .catch(err => console.log(err));
+    });
+  </script>
+</body>
+
+</html>
