@@ -33,6 +33,7 @@ function renderHTML() {
 
   document.body.appendChild($div); // body 요소 밑에 만든 태그 추가
 
+  // 등록 버튼
   const $addBtn = $div.querySelector('#addBtn');
   $addBtn.addEventListener('click', evt => {
     console.log('등록');

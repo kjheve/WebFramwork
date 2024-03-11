@@ -120,6 +120,7 @@
       console.log("삭제");
       $delModal.showModal(); // 모달창 띄우기
 
+      // 댓글번호
       $delModal.dataset.replyNumber = e.target.closest('li').dataset.replyNumber; // 댓글번호◎
 
       // e.target.closest('li').remove(); // 모달창에서 처리되게, 하지만 모달창은 e객체를 받을 방법이 없음 => 댓글번호◎ 생성함..
